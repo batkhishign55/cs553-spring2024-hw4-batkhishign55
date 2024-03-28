@@ -12,6 +12,7 @@
 
 #define NONCE_SIZE 6
 #define HASH_SIZE 10
+#define BUFFER_SIZE 1024 * 1024
 
 // Structure to hold a record
 typedef struct
@@ -27,6 +28,7 @@ typedef struct
     int end_index;
     uint8_t *hashes;
     int thread_no;
+    FILE *fp;
 } ThreadArgs2;
 
 typedef struct
@@ -34,6 +36,13 @@ typedef struct
     Record *records_block;
     size_t block_size;
 } ThreadArgs;
+
+typedef struct
+{
+    Record *records;
+    int start_index;
+    int end_index;
+} ThreadArgsGen;
 
 // Comparison function for sorting
 int compare_records(const void *a, const void *b)
@@ -84,46 +93,68 @@ pthread_mutex_t file_mutex;
 void *write_thread(void *arg)
 {
     ThreadArgs2 *args = (ThreadArgs2 *)arg;
-    clock_t start_time = clock();
-    printf("Thread %d started\n", args->thread_no);
+    // clock_t start_time = clock();
+    // printf("Write Thread %d started\n", args->thread_no);
 
-    mkdir("output", 0755);
-    FILE *fp = fopen("output/records.bin", "wb");
-    if (fp == NULL)
+    uint8_t buffer[BUFFER_SIZE];
+    size_t bytes_written = 0;
+    while (args->start_index + bytes_written < args->end_index)
     {
-        return NULL;
+        size_t chunk_size = args->end_index - (args->start_index + bytes_written);
+        if (chunk_size > BUFFER_SIZE)
+        {
+            chunk_size = BUFFER_SIZE;
+        }
+        memcpy(buffer, args->hashes + args->start_index + bytes_written, chunk_size);
+        fwrite(buffer, sizeof(uint8_t), chunk_size, args->fp);
+        bytes_written += chunk_size;
     }
+    // char filename[50];
+    // sprintf(filename, "output/records%d.bin", args->thread_no);
+    // FILE *fp = fopen(filename, "wb");
+    // if (fp == NULL)
+    // {
+    //     return NULL;
+    // }
 
-    int numBytes = args->end_index - args->start_index + 1;
+    // int numBytes = args->end_index - args->start_index + 1;
 
-    // Write the record to the file
-    fwrite(args->hashes + args->start_index, sizeof(uint8_t), numBytes, fp);
-    fclose(fp);
+    // // Write the record to the file
+    // fwrite(args->hashes + args->start_index, sizeof(uint8_t), numBytes, fp);
+    // fclose(fp);
 
-    double elapsed_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
-    printf("Thread %d elapsed time: %f seconds\n", args->thread_no, elapsed_time);
+    // double elapsed_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+    // printf("Write Thread %d elapsed time: %f seconds\n", args->thread_no, elapsed_time);
 
     return NULL;
 }
 
 void write_records(uint8_t *hashes, size_t byte_size, int num_threads)
 {
-    // Calculate records per thread (rounded down)
+    // clock_t start_time = clock();
     int block_size = byte_size / num_threads;
 
-    // Thread arguments and creation
+    mkdir("output", 0755);
+
     pthread_t threads[num_threads];
     ThreadArgs2 *thread_args = malloc(num_threads * sizeof(ThreadArgs2));
     for (int i = 0; i < num_threads; ++i)
     {
+        char filename[50];
+        sprintf(filename, "output/records%d.bin", i);
+        FILE *fp = fopen(filename, "wb");
+        if (fp == NULL)
+        {
+            return;
+        }
         int start_index = i * block_size;
-        // int end_index = (i == num_threads - 1) ? 1024 : (i + 1) * block_size;
         int end_index = (i + 1) * block_size;
 
         thread_args[i].start_index = start_index;
         thread_args[i].end_index = end_index;
         thread_args[i].hashes = hashes;
         thread_args[i].thread_no = i;
+        thread_args[i].fp = fp;
 
         pthread_create(&threads[i], NULL, write_thread, &thread_args[i]);
     }
@@ -133,21 +164,54 @@ void write_records(uint8_t *hashes, size_t byte_size, int num_threads)
     {
         pthread_join(threads[i], NULL);
     }
+    // double elapsed_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+    // printf("Write elapsed time: %f seconds\n", elapsed_time);
 }
 
-void generate_hashes(Record *records, size_t record_size)
+void *hash_thread(void *arg)
 {
+    ThreadArgsGen *args = (ThreadArgsGen *)arg;
+
+    // Each thread has its own hasher
     blake3_hasher hasher;
     blake3_hasher_init(&hasher);
 
-    for (int i = 0; i < record_size; i++)
+    for (int i = args->start_index; i < args->end_index; i++)
     {
         for (int j = 0; j < NONCE_SIZE; j++)
         {
-            records[i].nonce[j] = (i >> (j * 8)) & 0xFF;
+            args->records[i].nonce[j] = (i >> (j * 8)) & 0xFF;
         }
-        blake3_hasher_update(&hasher, records[i].nonce, NONCE_SIZE);
-        blake3_hasher_finalize(&hasher, records[i].hash, HASH_SIZE);
+        blake3_hasher_update(&hasher, args->records[i].nonce, NONCE_SIZE);
+        blake3_hasher_finalize(&hasher, args->records[i].hash, HASH_SIZE);
+    }
+
+    return NULL;
+}
+
+void generate_hashes(Record *records, size_t record_size, int num_threads)
+{
+    int block_size = record_size / num_threads;
+
+    pthread_t threads[num_threads];
+    ThreadArgsGen thread_args[num_threads];
+
+    for (int i = 0; i < num_threads; ++i)
+    {
+        int start_index = i * block_size;
+        int end_index = (i + 1) * block_size;
+
+        thread_args[i].records = records;
+        thread_args[i].start_index = start_index;
+        thread_args[i].end_index = end_index;
+
+        pthread_create(&threads[i], NULL, hash_thread, &thread_args[i]);
+    }
+
+    // Wait for all threads to finish
+    for (int i = 0; i < num_threads; ++i)
+    {
+        pthread_join(threads[i], NULL);
     }
 }
 
@@ -316,25 +380,54 @@ int main(int argc, char **argv)
     printf("HASH_SIZE: %dB\n", HASH_SIZE);
     printf("NONCE_SIZE: %dB\n", NONCE_SIZE);
 
-    clock_t start_time = clock();
+    struct timeval start_time, end_time, end_time1, end_time2, end_time3,end_time4;
+
+    gettimeofday(&start_time, NULL);
     const size_t record_size = pow(2, total_size);
     Record *records = malloc(record_size * sizeof(Record));
     uint8_t *hashes = malloc(record_size * (HASH_SIZE + NONCE_SIZE));
 
-    generate_hashes(records, record_size);
+    generate_hashes(records, record_size, thread_hash);
 
-    sort_records(records, record_size, thread_sort);
+    gettimeofday(&end_time1, NULL);
+    long long seconds = end_time1.tv_sec - start_time.tv_sec;
+    long long microseconds = end_time1.tv_usec - start_time.tv_usec;
+    printf("Hash Generation Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
+
+    // sort_records(records, record_size, thread_sort);
+
+    gettimeofday(&end_time2, NULL);
+    seconds = end_time2.tv_sec - end_time1.tv_sec;
+    microseconds = end_time2.tv_usec - end_time1.tv_usec;
+    printf("Sorting Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
 
     process_hashes(records, hashes, record_size);
 
+    gettimeofday(&end_time3, NULL);
+    seconds = end_time3.tv_sec - end_time2.tv_sec;
+    microseconds = end_time3.tv_usec - end_time2.tv_usec;
+    printf("Processing Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
+
     write_records(hashes, record_size * (HASH_SIZE + NONCE_SIZE), thread_write);
+
+    gettimeofday(&end_time4, NULL);
+    seconds = end_time4.tv_sec - end_time3.tv_sec;
+    microseconds = end_time4.tv_usec - end_time3.tv_usec;
+    printf("Writing Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
 
     // print_records(records, hashes, record_size);
 
-    clock_t end_time = clock();
-    double elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-    printf("Elapsed time: %f seconds\n", elapsed_time);
+    gettimeofday(&end_time, NULL);
+
+    seconds = end_time.tv_sec - start_time.tv_sec;
+    microseconds = end_time.tv_usec - start_time.tv_usec;
+
+    printf("Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
+    // clock_t end_time = clock();
+    // double elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    // printf("Elapsed time: %f seconds\n", elapsed_time);
 
     free(records);
+    free(hashes);
     return 0;
 }
