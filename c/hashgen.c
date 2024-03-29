@@ -55,9 +55,59 @@ int compare_records(const void *a, const void *b)
 // Function executed by each thread
 void *sort_thread(void *arg)
 {
-    ThreadArgs *args = (ThreadArgs *)arg;
+    ThreadArgsGen *args = (ThreadArgsGen *)arg;
     qsort(args->records_block, args->block_size, sizeof(Record), compare_records);
     return NULL;
+}
+
+void sort_records(Record *records, size_t record_size, int num_threads)
+{
+    int block_size = record_size / num_threads;
+
+    pthread_t threads[num_threads];
+    ThreadArgsGen thread_args[num_threads];
+    for (int i = 0; i < num_threads; i++)
+    {
+        int start_index = i * block_size;
+        int end_index = (i + 1) * block_size;
+
+        args[i].records = records;
+        args[i].start_index = start_index;
+        args[i].end_index = end_index;
+        pthread_create(&threads[i], NULL, sort_thread, &thread_args[i]);
+    }
+
+    for (int i = 0; i < num_threads; i++)
+    {
+        pthread_join(threads[i], NULL);
+    }
+}
+
+    // Merge sorted subarrays
+    // memcpy(records, thread_args[0].records_block, (block_size) * sizeof(Record));
+    // for (int i = 1; i < num_threads; i++)
+    // {
+    //     merge_subarrays(records, i * block_size - 1, thread_args[i]);
+    // }
+
+void merge_sorted_blocks(Record *records, size_t record_size, int num_threads) {
+    int block_size = record_size / num_threads;
+
+    while (num_threads > 1) {
+        int mid = num_threads / 2;
+
+        for (int i = 0; i < mid; i++) {
+            int left_start = i * block_size;
+            int left_end = (i + 1) * block_size;
+            int right_start = left_end;
+            int right_end = (i + 2) * block_size;
+
+            merge(records, left_start, left_end, right_start, right_end);
+        }
+
+        block_size *= 2;
+        num_threads = mid;
+    }
 }
 
 // Merge two sorted subarrays
@@ -224,40 +274,6 @@ void process_hashes(Record *records, uint8_t *hashes, size_t record_size)
     }
 }
 
-void sort_records(Record *records, size_t record_size, int num_threads)
-{
-    ThreadArgs *thread_args = malloc(num_threads * sizeof(ThreadArgs));
-    int block_size = record_size / num_threads;
-    for (int i = 0; i < num_threads; i++)
-    {
-        Record *separate_records = malloc(block_size * sizeof(Record));
-        size_t start_index = i * block_size;
-        size_t end_index = (i + 1) * block_size - 1;
-        memcpy(separate_records + 0, records + start_index, (end_index - start_index + 1) * sizeof(Record));
-        thread_args[i].records_block = separate_records;
-        thread_args[i].block_size = block_size;
-    }
-
-    pthread_t threads[num_threads];
-    for (int i = 0; i < num_threads; i++)
-    {
-        pthread_create(&threads[i], NULL, sort_thread, &thread_args[i]);
-    }
-
-    for (int i = 0; i < num_threads; i++)
-    {
-        pthread_join(threads[i], NULL);
-    }
-
-    // Merge sorted subarrays
-    memcpy(records, thread_args[0].records_block, (block_size) * sizeof(Record));
-    for (int i = 1; i < num_threads; i++)
-    {
-        merge_subarrays(records, i * block_size - 1, thread_args[i]);
-    }
-    free(thread_args);
-}
-
 void print_records(Record *records, uint8_t *hashes, size_t record_size)
 {
     for (int i = 0; i < record_size; i++)
@@ -394,7 +410,7 @@ int main(int argc, char **argv)
     long long microseconds = end_time1.tv_usec - start_time.tv_usec;
     printf("Hash Generation Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
 
-    // sort_records(records, record_size, thread_sort);
+    sort_records(records, record_size, thread_sort);
 
     gettimeofday(&end_time2, NULL);
     seconds = end_time2.tv_sec - end_time1.tv_sec;
