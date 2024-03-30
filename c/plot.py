@@ -83,7 +83,7 @@ def plot_data():
 
     fig, axs = plt.subplots(1)
     axs.plot(xss, res, label="h-hash, s-sort, w-write")
-    axs.set_title('Hash - thread performance')
+    axs.set_title('Overall performance')
     axs.legend()
     axs.set_ylabel('Elapsed time(s)')
     plt.xticks(rotation=90)  # Direct rotation
