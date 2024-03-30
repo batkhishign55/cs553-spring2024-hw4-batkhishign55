@@ -74,6 +74,7 @@ void *sort_thread(void *arg)
 
 void sort_records(Record *records, size_t record_size, int num_threads)
 {
+    read_buckets();
     int block_size = record_size / num_threads;
 
     pthread_t threads[num_threads];
@@ -158,8 +159,6 @@ pthread_mutex_t file_mutex;
 void *write_thread(void *arg)
 {
     ThreadArgs2 *args = (ThreadArgs2 *)arg;
-    // clock_t start_time = clock();
-    // printf("Write Thread %d started\n", args->thread_no);
 
     uint8_t buffer[BUFFER_SIZE];
     size_t bytes_written = 0;
@@ -174,22 +173,6 @@ void *write_thread(void *arg)
         fwrite(buffer, sizeof(uint8_t), chunk_size, args->fp);
         bytes_written += chunk_size;
     }
-    // char filename[50];
-    // sprintf(filename, "output/records%d.bin", args->thread_no);
-    // FILE *fp = fopen(filename, "wb");
-    // if (fp == NULL)
-    // {
-    //     return NULL;
-    // }
-
-    // int numBytes = args->end_index - args->start_index + 1;
-
-    // // Write the record to the file
-    // fwrite(args->hashes + args->start_index, sizeof(uint8_t), numBytes, fp);
-    // fclose(fp);
-
-    // double elapsed_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
-    // printf("Write Thread %d elapsed time: %f seconds\n", args->thread_no, elapsed_time);
 
     return NULL;
 }
@@ -255,64 +238,46 @@ void *hash_thread(void *arg)
 
     for (size_t i = args->start_index; i < args->end_index; ++i)
     {
-        Record record;
+        Record *record = malloc(NONCE_SIZE + HASH_SIZE);
         for (size_t j = 0; j < NONCE_SIZE; j++)
         {
-            record.nonce[j] = ((i + args->offset) >> j * 8) & 0xFF;
+            record->nonce[j] = ((i + args->offset) >> j * 8) & 0xFF;
         }
 
-        blake3_hasher_update(&hasher, record.nonce, NONCE_SIZE);
-        blake3_hasher_finalize(&hasher, record.hash, HASH_SIZE);
+        blake3_hasher_update(&hasher, record->nonce, NONCE_SIZE);
+        blake3_hasher_finalize(&hasher, record->hash, HASH_SIZE);
 
-        int bidx = record.hash[0];
+        int bidx = record->hash[0];
         // for (size_t j = 0; j < NONCE_SIZE; j++)
         // {
-        //     printf("%02x", record.nonce[j]);
+        //     printf("%02x", record->nonce[j]);
         // }
         // printf(" ");
         // for (size_t j = 0; j < HASH_SIZE; j++)
         // {
-        //     printf("%02x", record.hash[j]);
+        //     printf("%02x", record->hash[j]);
         // }
         // printf(" %d", bidx);
         // printf("\n");
         pthread_mutex_lock(&bucket_mutexes[bidx]);
 
-        Record *current_bucket = buckets[bidx];
-        // printf("zl");
-
         // Reallocate memory for the bucket with increased size
-        buckets[bidx] = realloc(buckets[bidx], sizeof(Record) * (bucket_size[bidx] + 1));
-        if (buckets[bidx] == NULL)
-        {
-            // Handle reallocation failure (e.g., print error)
-            printf("zl");
-        }
+        // buckets[bidx] = realloc(buckets[bidx], sizeof(Record) * (bucket_size[bidx] + 1));
+        // if (buckets[bidx] == NULL)
+        // {
+        //     printf("reallocation failed");
+        // }
+
+        // printf("%zu\n", args->end_index);
 
         // Copy the record data
-        memcpy(&buckets[bidx][bucket_size[bidx]], &record, sizeof(Record));
+        memcpy(&buckets[bidx][bucket_size[bidx]], record, sizeof(Record));
         bucket_size[bidx] += 1;
         pthread_mutex_unlock(&bucket_mutexes[bidx]);
     }
-
-    // for (size_t i = args->start_index; i < args->end_index; i++)
-    // {
-    //     for (size_t j = 0; j < NONCE_SIZE; j++)
-    //     {
-    //         printf("%02x", args->records[i].nonce[j]);
-    //     }
-    //     printf(" ");
-    //     for (size_t j = 0; j < HASH_SIZE; j++)
-    //     {
-    //         printf("%02x", args->records[i].hash[j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    return NULL;
 }
 
-void generate_hashes(size_t mem_size, size_t file_size, int num_threads)
+void generate_hashes(size_t mem_size, size_t file_size, int num_threads, int write_threads)
 {
     printf("mem_size: %zuMB\n", mem_size / 1024 / 1024);
     printf("file_size: %zuMB\n", file_size / 1024 / 1024);
@@ -334,7 +299,7 @@ void generate_hashes(size_t mem_size, size_t file_size, int num_threads)
         for (int i = 0; i < NUM_BUCKETS; ++i)
         {
             // Allocate memory for an array of Record with initial size 0
-            buckets[i] = malloc(sizeof(Record) * 0);
+            buckets[i] = malloc(sizeof(Record) * mem_size / NUM_BUCKETS * 2);
             if (buckets[i] == NULL)
             {
                 exit(1);
@@ -350,7 +315,7 @@ void generate_hashes(size_t mem_size, size_t file_size, int num_threads)
             thread_args[i].start_index = start_index;
             thread_args[i].end_index = end_index;
             thread_args[i].offset = j;
-            printf("thread %d: %zuKB\t %zuKB\n", i, start_index / 1024, end_index / 1024);
+            // printf("thread %d: %zuK\t %zuK\n", i, start_index / 1024, end_index / 1024);
             pthread_create(&threads[i], NULL, hash_thread, &thread_args[i]);
         }
 
@@ -358,6 +323,14 @@ void generate_hashes(size_t mem_size, size_t file_size, int num_threads)
         for (int i = 0; i < num_threads; ++i)
         {
             pthread_join(threads[i], NULL);
+        }
+
+        write_buckets(write_threads);
+
+        // free(buckets);
+        for (int i = 0; i < NUM_BUCKETS; i++)
+        {
+            bucket_size[i] = 0;
         }
     }
     printf("cnt: %d\n", cnt);
@@ -378,9 +351,9 @@ void *write_bucket_thread(void *arg)
             printf("file open error");
             return;
         }
-        printf("size of the bucket: %ld\n", sizeof(buckets[i]));
+        // printf("size of the bucket: %d\n", bucket_size[i] * (NONCE_SIZE + HASH_SIZE));
 
-        size_t written = fwrite(buckets[i], sizeof(buckets[i]), 1, fp);
+        size_t written = fwrite(buckets[i], bucket_size[i] * (NONCE_SIZE + HASH_SIZE), 1, fp);
         if (written != 1)
         {
             fprintf(stderr, "Error writing record to file\n");
@@ -401,7 +374,7 @@ void write_buckets(int num_threads)
     {
         int start_index = i * bucket_size;
         int end_index = (i + 1) * bucket_size;
-        printf("start %d, end %d\n", start_index, end_index);
+        // printf("start %d, end %d\n", start_index, end_index);
 
         thread_args[i].start_index = start_index;
         thread_args[i].end_index = end_index;
@@ -414,6 +387,10 @@ void write_buckets(int num_threads)
     {
         pthread_join(threads[i], NULL);
     }
+}
+
+void read_buckets() {
+    
 }
 
 void process_hashes(Record *records, uint8_t *hashes, size_t record_size)
@@ -563,17 +540,18 @@ int main(int argc, char **argv)
     Record *records = malloc(file_size * sizeof(Record));
     uint8_t *hashes = malloc(file_size * (HASH_SIZE + NONCE_SIZE));
 
-    generate_hashes(mem_size * 1024 * 1024, file_size, thread_hash);
+    generate_hashes(mem_size * 1024 * 1024, file_size, thread_hash, thread_write);
 
     gettimeofday(&end_time1, NULL);
     long long seconds = end_time1.tv_sec - start_time.tv_sec;
     long long microseconds = end_time1.tv_usec - start_time.tv_usec;
     printf("Hash Generation Elapsed time (s): %f\n", seconds + microseconds / 1000000.0);
 
-    write_buckets(thread_write);
-    return NULL;
+    // write_buckets(thread_write);
 
-    sort_records(records, file_size, thread_sort);
+    sort_records(thread_sort);
+
+    return NULL;
 
     gettimeofday(&end_time2, NULL);
     seconds = end_time2.tv_sec - end_time1.tv_sec;
