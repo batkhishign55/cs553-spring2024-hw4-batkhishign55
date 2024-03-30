@@ -1,0 +1,324 @@
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 78.840468
+Sorting Elapsed time (s): 30.616018
+Processing Elapsed time (s): 0.948828
+Writing Elapsed time (s): 1.193098
+Elapsed time (s): 111.598420
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 79.104972
+Sorting Elapsed time (s): 30.502186
+Processing Elapsed time (s): 0.996058
+Writing Elapsed time (s): 0.574587
+Elapsed time (s): 111.177812
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 79.516852
+Sorting Elapsed time (s): 28.507902
+Processing Elapsed time (s): 0.937483
+Writing Elapsed time (s): 0.471512
+Elapsed time (s): 109.433756
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 80.028627
+Sorting Elapsed time (s): 7.817974
+Processing Elapsed time (s): 0.978829
+Writing Elapsed time (s): 1.124099
+Elapsed time (s): 89.949533
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 79.109262
+Sorting Elapsed time (s): 7.394111
+Processing Elapsed time (s): 0.978950
+Writing Elapsed time (s): 0.543205
+Elapsed time (s): 88.025533
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 79.310830
+Sorting Elapsed time (s): 7.241854
+Processing Elapsed time (s): 0.817032
+Writing Elapsed time (s): 0.477698
+Elapsed time (s): 87.847423
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 79.596830
+Sorting Elapsed time (s): 2.473897
+Processing Elapsed time (s): 1.933139
+Writing Elapsed time (s): 1.126005
+Elapsed time (s): 85.129884
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 78.864002
+Sorting Elapsed time (s): 2.394018
+Processing Elapsed time (s): 0.838042
+Writing Elapsed time (s): 0.552036
+Elapsed time (s): 82.648107
+NUM_THREADS_HASH: 1
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 78.750439
+Sorting Elapsed time (s): 2.439828
+Processing Elapsed time (s): 0.871913
+Writing Elapsed time (s): 0.451276
+Elapsed time (s): 82.513461
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 19.017716
+Sorting Elapsed time (s): 29.552147
+Processing Elapsed time (s): 0.888152
+Writing Elapsed time (s): 1.144211
+Elapsed time (s): 50.602234
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 18.975389
+Sorting Elapsed time (s): 29.285242
+Processing Elapsed time (s): 0.959384
+Writing Elapsed time (s): 0.556341
+Elapsed time (s): 49.776363
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 18.994121
+Sorting Elapsed time (s): 29.322906
+Processing Elapsed time (s): 1.001199
+Writing Elapsed time (s): 0.461769
+Elapsed time (s): 49.780005
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 19.623230
+Sorting Elapsed time (s): 6.777441
+Processing Elapsed time (s): 1.020233
+Writing Elapsed time (s): 1.193709
+Elapsed time (s): 28.614621
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 18.405747
+Sorting Elapsed time (s): 6.399402
+Processing Elapsed time (s): 0.888592
+Writing Elapsed time (s): 0.583531
+Elapsed time (s): 26.277282
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 18.616817
+Sorting Elapsed time (s): 7.359323
+Processing Elapsed time (s): 1.186567
+Writing Elapsed time (s): 0.471016
+Elapsed time (s): 27.633732
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 18.906877
+Sorting Elapsed time (s): 2.189310
+Processing Elapsed time (s): 0.869823
+Writing Elapsed time (s): 1.118773
+Elapsed time (s): 23.084791
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 19.658705
+Sorting Elapsed time (s): 2.169766
+Processing Elapsed time (s): 0.863663
+Writing Elapsed time (s): 0.558336
+Elapsed time (s): 23.250475
+NUM_THREADS_HASH: 4
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 19.895924
+Sorting Elapsed time (s): 2.068339
+Processing Elapsed time (s): 0.820413
+Writing Elapsed time (s): 0.459911
+Elapsed time (s): 23.244591
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.974495
+Sorting Elapsed time (s): 29.239059
+Processing Elapsed time (s): 0.998643
+Writing Elapsed time (s): 1.183620
+Elapsed time (s): 37.395826
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.634528
+Sorting Elapsed time (s): 29.134892
+Processing Elapsed time (s): 1.010337
+Writing Elapsed time (s): 0.575631
+Elapsed time (s): 36.355394
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 1
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.594693
+Sorting Elapsed time (s): 29.387218
+Processing Elapsed time (s): 1.005876
+Writing Elapsed time (s): 0.466145
+Elapsed time (s): 36.453942
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.592485
+Sorting Elapsed time (s): 7.022923
+Processing Elapsed time (s): 1.012854
+Writing Elapsed time (s): 1.116715
+Elapsed time (s): 14.744985
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.538036
+Sorting Elapsed time (s): 6.519944
+Processing Elapsed time (s): 1.020815
+Writing Elapsed time (s): 0.568253
+Elapsed time (s): 13.647057
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 4
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 6.088084
+Sorting Elapsed time (s): 6.551670
+Processing Elapsed time (s): 1.002434
+Writing Elapsed time (s): 0.466669
+Elapsed time (s): 14.108865
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 1
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.540778
+Sorting Elapsed time (s): 2.070860
+Processing Elapsed time (s): 0.881262
+Writing Elapsed time (s): 1.113419
+Elapsed time (s): 9.606335
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 4
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.584669
+Sorting Elapsed time (s): 2.091618
+Processing Elapsed time (s): 0.866183
+Writing Elapsed time (s): 0.545565
+Elapsed time (s): 9.088045
+NUM_THREADS_HASH: 16
+NUM_THREADS_SORT: 16
+NUM_THREADS_WRITE: 16
+TOTAL_RECORD_SIZE: 1024MB
+RECORD_SIZE: 16B
+HASH_SIZE: 10B
+NONCE_SIZE: 6B
+Hash Generation Elapsed time (s): 5.693866
+Sorting Elapsed time (s): 2.408317
+Processing Elapsed time (s): 1.036891
+Writing Elapsed time (s): 0.458825
+Elapsed time (s): 9.597904
